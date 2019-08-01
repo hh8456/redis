@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 )
 
 // RedisSession holds the internal redis pool and the prefix for command/key
@@ -30,40 +30,11 @@ var (
 	ErrKeysNotSet        = errors.New("keys are not set")
 )
 
-// NewRedisSession creates a new Redis Pool with optional Redis Dial configurations.
-func NewRedisSession(conf *RedisConf, options ...redis.DialOption) (*RedisSession, error) {
+func NewRedisSessionWithPool(pool *redis.Pool) *RedisSession {
 	s := &RedisSession{}
-	if len(options) == 0 {
-		options = []redis.DialOption{
-			redis.DialReadTimeout(5 * time.Second),
-			redis.DialWriteTimeout(time.Second),
-			redis.DialConnectTimeout(time.Second),
-		}
-	}
-
-	options = append(options, redis.DialDatabase(conf.DB))
-
-	pool := &redis.Pool{
-		MaxIdle:     3,
-		MaxActive:   1000,
-		IdleTimeout: 30 * time.Second,
-		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", conf.Server, options...)
-			if err != nil {
-				return nil, err
-			}
-			return c, err
-		},
-		TestOnBorrow: func(c redis.Conn, t time.Time) error {
-			_, err := c.Do("PING")
-			return err
-		},
-	}
 	s.pool = pool
-	// when we use connection pooling
-	// dialing and returning an error will be
-	// with the request
-	return s, nil
+
+	return s
 }
 
 // Pool Returns the connection pool for redis
