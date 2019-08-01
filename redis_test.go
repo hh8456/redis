@@ -1,4 +1,4 @@
-package redis
+package redisSession
 
 import (
 	"fmt"
