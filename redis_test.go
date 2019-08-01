@@ -5,23 +5,46 @@ import (
 	"testing"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 )
 
 var (
 	session *RedisSession
 	prefix  string
+	pool    *redis.Pool
 )
 
 func init() {
-	var err error
-	conf := &RedisConf{Server: "localhost:6379"}
-	session, err = NewRedisSession(conf)
-	if err != nil {
-		panic(fmt.Sprintf("Could not start redis: %s", err))
+	var e error
+	pool = &redis.Pool{
+		MaxIdle:     10,
+		MaxActive:   50,
+		Wait:        true,
+		IdleTimeout: 300 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.Dial("tcp", "192.168.100.60:6379")
+			if err != nil {
+				e = err
+				return nil, err
+			}
+
+			if _, err := c.Do("AUTH", "dev123"); err != nil {
+				c.Close()
+				e = err
+				return nil, err
+			}
+
+			return c, nil
+		},
 	}
 	prefix = "testing"
-	// defer session.Close()
+
+	if e != nil {
+		str := fmt.Sprintf("create redis pool has error: %v", e)
+		panic(str)
+	}
+
+	session = NewRedisSessionWithPool(pool)
 }
 
 func TestPrefix(t *testing.T) {
