@@ -57,6 +57,10 @@ func (r *RedisSession) AddPrefix(name string) string {
 	return r.prefix + name
 }
 
+func (r *RedisSession) GetPrefix() string {
+	return r.prefix
+}
+
 // Do is a wrapper around redigo's redis.Do method that executes any redis
 // command. Do does not support prefix support. Example usage: redis.Do("INCR",
 // "counter").
