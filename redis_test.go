@@ -47,6 +47,22 @@ func init() {
 	session = NewRedisSessionWithPool(pool)
 }
 
+func TestMGet(t *testing.T) {
+	session.SetPrefix(prefix)
+	session.AddPrefix("mget_test")
+	session.Set("1", "1")
+	session.Set("2", "2")
+	session.Set("3", "3")
+	session.Set("4", "4")
+	session.Set("5", "5")
+	session.Set("6", "6")
+
+	r, _ := session.MGet([]string{"1", "2", "3", "4", "5", "6"})
+	for _, v := range r {
+		t.Logf("%s\n", v)
+	}
+}
+
 func TestPrefix(t *testing.T) {
 	session.SetPrefix(prefix)
 	key := session.AddPrefix("muppets")
