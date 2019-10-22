@@ -1,4 +1,4 @@
-module redisSession
+module github.com/hh8456/redisSession
 
 go 1.12
 
