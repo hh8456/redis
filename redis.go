@@ -108,13 +108,13 @@ func (r *RedisSession) Get(key string) (string, error) {
 	return reply, nil
 }
 
-func (r *RedisSession) MGet(keys []string) ([]interface{}, error) {
+func (r *RedisSession) MGet(keys []string) ([]string, error) {
 	prefixed := make([]interface{}, 0)
 	for _, key := range keys {
 		prefixed = append(prefixed, r.AddPrefix(key))
 	}
 
-	return redis.Values(r.Do("MGET", prefixed...))
+	return redis.Strings(r.Do("MGET", prefixed...))
 }
 
 // GetInt is used the value of key as an integer. If the key does not exist or
