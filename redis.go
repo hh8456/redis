@@ -98,8 +98,9 @@ func (r *RedisSession) Set(key, value string) error {
 	return nil
 }
 
-func (r *RedisSession) SetExNx(key, value string, timeout time.Duration) (string, error) {
-	reply, err := r.Do("SET", r.AddPrefix(key), value, "ex", timeout, "nx")
+func (r *RedisSession) SetExNx(key string, value interface{}, timeout time.Duration) (string, error) {
+	seconds := strconv.Itoa(int(timeout.Seconds()))
+	reply, err := r.Do("SET", r.AddPrefix(key), value, "ex", seconds, "nx")
 	if err != nil {
 		return "ERROR", err
 	}
