@@ -98,6 +98,19 @@ func (r *RedisSession) Set(key, value string) error {
 	return nil
 }
 
+func (r *RedisSession) SetExNx(key, value string, timeout time.Duration) (string, error) {
+	reply, err := r.Do("SET", r.AddPrefix(key), value, "ex", timeout, "nx")
+	if err != nil {
+		return "ERROR", err
+	}
+
+	if reply == nil {
+		return "NX", nil
+
+	}
+	return "OK", nil
+}
+
 // Get is used to get the value of key. If the key does not exist an empty
 // string is returned. Usage: redis.Get("arslan")
 func (r *RedisSession) Get(key string) (string, error) {
