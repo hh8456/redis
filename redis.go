@@ -141,10 +141,10 @@ func (r *RedisSession) GetInt(key string) (int, error) {
 // Del is used to remove the specified keys. Key is ignored if it does not
 // exist. It returns the number of keys that were removed. Example usage:
 // redis.Del("counter", "arslan:name")
-func (r *RedisSession) Del(args ...interface{}) (int, error) {
+func (r *RedisSession) Del(args ...string) (int, error) {
 	prefixed := make([]interface{}, 0)
 	for _, arg := range args {
-		prefixed = append(prefixed, r.AddPrefix(arg.(string)))
+		prefixed = append(prefixed, r.AddPrefix(arg))
 	}
 
 	return redis.Int(r.Do("DEL", prefixed...))
