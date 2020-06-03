@@ -98,6 +98,20 @@ func (r *RedisSession) Set(key, value string) error {
 	return nil
 }
 
+func (r *RedisSession) SetExNx(key string, value interface{}, timeout time.Duration) (string, error) {
+	seconds := strconv.Itoa(int(timeout.Seconds()))
+	reply, err := r.Do("SET", r.AddPrefix(key), value, "ex", seconds, "nx")
+	if err != nil {
+		return "ERROR", err
+	}
+
+	if reply == nil {
+		return "NX", nil
+
+	}
+	return "OK", nil
+}
+
 // Get is used to get the value of key. If the key does not exist an empty
 // string is returned. Usage: redis.Get("arslan")
 func (r *RedisSession) Get(key string) (string, error) {
@@ -127,10 +141,10 @@ func (r *RedisSession) GetInt(key string) (int, error) {
 // Del is used to remove the specified keys. Key is ignored if it does not
 // exist. It returns the number of keys that were removed. Example usage:
 // redis.Del("counter", "arslan:name")
-func (r *RedisSession) Del(args ...interface{}) (int, error) {
+func (r *RedisSession) Del(args ...string) (int, error) {
 	prefixed := make([]interface{}, 0)
 	for _, arg := range args {
-		prefixed = append(prefixed, r.AddPrefix(arg.(string)))
+		prefixed = append(prefixed, r.AddPrefix(arg))
 	}
 
 	return redis.Int(r.Do("DEL", prefixed...))
