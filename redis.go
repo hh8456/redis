@@ -212,6 +212,15 @@ func (r *RedisSession) TTL(key string) (time.Duration, error) {
 	return time.Duration(reply) * time.Second, nil
 }
 
+func (r *RedisSession) Setnx(key string, item interface{}) (int64, error) {
+	reply, e := r.Do("setnx", r.AddPrefix(key), item)
+	if e != nil {
+		return 0, e
+	}
+
+	return reply.(int64), nil
+}
+
 // Set key to hold the string value and set key to timeout after a given
 // number of seconds. This command is equivalent to executing the following commands:
 // SET mykey value
