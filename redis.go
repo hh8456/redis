@@ -50,7 +50,9 @@ func (r *RedisSession) Close() error {
 // SetPrefix is used to add a prefix to all keys to be used. It is useful for
 // creating namespaces for each different application
 func (r *RedisSession) SetPrefix(name string) {
-	r.prefix = name + ":"
+	if name != "" {
+		r.prefix = name + ":"
+	}
 }
 
 func (r *RedisSession) AddPrefix(name string) string {
